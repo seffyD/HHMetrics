@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "workspaces": [
+    "the-foundry"
+  ],
+  "scripts": {
+    "dev": "cd the-foundry && npm run dev",
+    "build": "cd the-foundry && npm run build",
+    "start": "cd the-foundry && npm run start",
+    "lint": "cd the-foundry && npm run lint"
+  }
+}
