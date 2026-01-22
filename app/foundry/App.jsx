@@ -17,6 +17,14 @@ import { DataProvider, useData } from "./dataContext";
 /* =========================
    Helpers over device bundles
    ========================= */
+const LINE_COLORS = [
+    "#2563eb", // blue-600
+    "#dc2626", // red-600
+    "#16a34a", // green-600
+    "#7c3aed", // violet-600
+    "#ea580c", // orange-600
+    "#0891b2", // cyan-600
+];
 function uniqueSorted(arr) {
     return Array.from(new Set(arr)).sort((a, b) => (a > b ? 1 : a < b ? -1 : 0));
 }
@@ -145,6 +153,44 @@ function Range({ value, onChange, min, max, step = 1, label }) {
 /* =========================
    Pages (bundles-aware)
    ========================= */
+
+function HomePage() {
+    return (
+        <Section title="Handheld Metrics">
+            <Card>
+                <p className="text-sm text-gray-700">
+                    Handheld Metrics is a data-driven comparison site for modern gaming handhelds.
+                    Explore real-world performance, power scaling, and specs across devices,
+                    processors, and integrated GPUs.
+                </p>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <Card className="text-center">
+                        <h3 className="font-semibold">📊 Performance</h3>
+                        <p className="mt-1 text-sm text-gray-600">
+                            Compare FPS, 1% lows, and wattage scaling.
+                        </p>
+                    </Card>
+
+                    <Card className="text-center">
+                        <h3 className="font-semibold">🔋 Efficiency</h3>
+                        <p className="mt-1 text-sm text-gray-600">
+                            See how devices perform per watt.
+                        </p>
+                    </Card>
+
+                    <Card className="text-center">
+                        <h3 className="font-semibold">🧠 Hardware</h3>
+                        <p className="mt-1 text-sm text-gray-600">
+                            Dive into CPUs, iGPUs, and memory configs.
+                        </p>
+                    </Card>
+                </div>
+            </Card>
+        </Section>
+    );
+}
+
 
 function DeviceComparisonPage({ onOpenReview }) {
     const { devices } = useData();
@@ -410,23 +456,34 @@ function DeviceComparisonPage({ onOpenReview }) {
                                     />
                                     <Tooltip formatter={(v, n) => [`${v} FPS`, n]} />
                                     <Legend />
-                                    {selected.map((d) => {
-                                        const name = d.specs.name;
-                                        return (
-                                            <React.Fragment key={d.id}>
-                                                <Line type="monotone" dataKey={name} name={`${name} (avg)`} dot={false} />
-                                                {dvShowP1 && (
+                                        {selected.map((d, idx) => {
+                                            const name = d.specs.name;
+                                            const color = LINE_COLORS[idx % LINE_COLORS.length];
+
+                                            return (
+                                                <React.Fragment key={d.id}>
                                                     <Line
                                                         type="monotone"
-                                                        dataKey={`${name} (1% low)`}
-                                                        name={`${name} (1% low)`}
-                                                        dot={false}
-                                                        strokeDasharray="4 4"
+                                                        dataKey={name}
+                                                        name={`${name} (avg)`}
+                                                        dot={true}
+                                                        stroke={color}
+                                                        strokeWidth={2}
                                                     />
-                                                )}
-                                            </React.Fragment>
-                                        );
-                                    })}
+                                                    {dvShowP1 && (
+                                                        <Line
+                                                            type="monotone"
+                                                            dataKey={`${name} (1% low)`}
+                                                            name={`${name} (1% low)`}
+                                                            dot={false}
+                                                            stroke={color}
+                                                            strokeDasharray="4 4"
+                                                            strokeWidth={2}
+                                                        />
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })}
                                 </LineChart>
                             )}
                         </ResponsiveContainer>
@@ -620,7 +677,6 @@ function ProcessorsPage() {
             };
         });
     }, [selProcs, pcGame, pcWatt, devices]);
-
     const lineWattages = useMemo(() => allWattages(devices), [devices]);
     const pcLineData = useMemo(() => {
         return lineWattages.map((w) => {
@@ -724,20 +780,34 @@ function ProcessorsPage() {
                                     <YAxis tick={{ fontSize: 12 }} label={{ value: "FPS", angle: -90, position: "insideLeft" }} />
                                     <Tooltip formatter={(v, n) => [`${v} FPS`, n]} />
                                     <Legend />
-                                    {Array.from(selProcs).map((name) => (
-                                        <React.Fragment key={name}>
-                                            <Line type="monotone" dataKey={`${name} (avg)`} name={`${name} (avg)`} dot={false} />
-                                            {pcShowP1 && (
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey={`${name} (1% low)`}
-                                                    name={`${name} (1% low)`}
-                                                    dot={false}
-                                                    strokeDasharray="4 4"
-                                                />
-                                            )}
-                                        </React.Fragment>
-                                    ))}
+                                        {Array.from(selProcs).map((name, idx) => {
+                                            const color = LINE_COLORS[idx % LINE_COLORS.length];
+
+                                            return (
+                                                <React.Fragment key={name}>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey={`${name} (avg)`}
+                                                        name={`${name} (avg)`}
+                                                        dot={true}
+                                                        stroke={color}
+                                                        strokeWidth={2}
+                                                    />
+                                                    {pcShowP1 && (
+                                                        <Line
+                                                            type="monotone"
+                                                            dataKey={`${name} (1% low)`}
+                                                            name={`${name} (1% low)`}
+                                                            dot={false}
+                                                            stroke={color}
+                                                            strokeDasharray="4 4"
+                                                            strokeWidth={2}
+                                                        />
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })}
+
                                 </LineChart>
                             )}
                         </ResponsiveContainer>
@@ -891,20 +961,34 @@ function IGpusPage() {
                                     <YAxis tick={{ fontSize: 12 }} label={{ value: "FPS", angle: -90, position: "insideLeft" }} />
                                     <Tooltip formatter={(v, n) => [`${v} FPS`, n]} />
                                     <Legend />
-                                    {Array.from(selectedIGPUs).map((name) => (
-                                        <React.Fragment key={name}>
-                                            <Line type="monotone" dataKey={`${name} (avg)`} name={`${name} (avg)`} dot={false} />
-                                            {showP1 && (
-                                                <Line
-                                                    type="monotone"
-                                                    dataKey={`${name} (1% low)`}
-                                                    name={`${name} (1% low)`}
-                                                    dot={false}
-                                                    strokeDasharray="4 4"
-                                                />
-                                            )}
-                                        </React.Fragment>
-                                    ))}
+                                        {Array.from(selectedIGPUs).map((name, idx) => {
+                                            const color = LINE_COLORS[idx % LINE_COLORS.length];
+
+                                            return (
+                                                <React.Fragment key={name}>
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey={`${name} (avg)`}
+                                                        name={`${name} (avg)`}
+                                                        dot={true}
+                                                        stroke={color}
+                                                        strokeWidth={2}
+                                                    />
+                                                    {showP1 && (
+                                                        <Line
+                                                            type="monotone"
+                                                            dataKey={`${name} (1% low)`}
+                                                            name={`${name} (1% low)`}
+                                                            dot={false}
+                                                            stroke={color}
+                                                            strokeDasharray="4 4"
+                                                            strokeWidth={2}
+                                                        />
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })}
+
                                 </LineChart>
                             )}
                         </ResponsiveContainer>
@@ -984,15 +1068,17 @@ function ReviewsPage({ filterDeviceId }) {
    Nav & App
    ========================= */
 const PAGES = [
-    { id: "deviceComparison", label: "Device Comparison", component: DeviceComparisonPage },
-    { id: "compare", label: "Compare", component: ComparePage },
-    { id: "processors", label: "Processors", component: ProcessorsPage },
-    { id: "igpus", label: "iGPUs", component: IGpusPage },
+    { id: "home", label: "Home", component: HomePage },
+    { id: "deviceComparison", label: "Compare Performance", component: DeviceComparisonPage },
+    { id: "compare", label: "Compare Specs", component: ComparePage },
+    { id: "processors", label: "Compare by Processor", component: ProcessorsPage },
+    { id: "igpus", label: "Compare by iGPU", component: IGpusPage },
     { id: "reviews", label: "Reviews", component: ReviewsPage },
 ];
 
+
 export default function App() {
-    const [page, setPage] = useState("devices");
+    const [page, setPage] = useState("home");
     const [reviewFilter, setReviewFilter] = useState(null);
 
     function openReviewForDevice(deviceId) {
@@ -1006,13 +1092,11 @@ export default function App() {
                 <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-xl bg-slate-900" />
-                            <div>
-                                <div className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                    Handheld
-                                </div>
-                                <h1 className="text-lg font-bold">Metrics</h1>
-                            </div>
+                            <img
+                                src="/HHM.png"
+                                alt="Handheld Metrics logo"
+                                className="h-32 w-32 rounded-lg bg-slate-900"
+                            />
                         </div>
                         <nav className="flex flex-wrap items-center gap-1">
                             {PAGES.map((p) => (
@@ -1033,6 +1117,7 @@ export default function App() {
                 </header>
 
                 <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
+                    {page === "home" && <HomePage />}
                     {page === "deviceComparison" && <DeviceComparisonPage onOpenReview={openReviewForDevice} />}
                     {page === "compare" && <ComparePage />}
                     {page === "processors" && <ProcessorsPage />}

@@ -39,7 +39,7 @@ export const GPD_WIN_MAX_2 = {
         { id: "fortnite1080pPerf", label: "Fortnite — 1080p Performance" },
     ],
     wattages: [10, 15, 25, 30],
-    perfAvg: { cyberpunk1080pLow: { 10: 43, 15: 56, 25: 71, 30: 79 } },
+    perfAvg: {},
     perfP1: {},
     reviews: [],
 };
