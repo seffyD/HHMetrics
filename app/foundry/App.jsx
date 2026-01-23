@@ -158,7 +158,13 @@ function HomePage() {
     return (
         <Section title="Handheld Metrics">
             <Card>
-                <p className="text-sm text-gray-700">
+                <p className="text-med text-gray-700">
+                    Hello! It looks as though you have stumbled onto my site before it has been fully launched. Please feel free
+                    to explore the comparison tools and data available, but keep in mind that some features and reviews may still
+                    be in development. Thank you for your understanding as I work towards completing Handheld Metrics!
+                </p>
+                <br></br>
+               <p className="text-med text-gray-700">
                     Handheld Metrics is a data-driven comparison site for modern gaming handhelds.
                     Explore real-world performance, power scaling, and specs across devices,
                     processors, and integrated GPUs.
